@@ -1,0 +1,20 @@
+from sqlalchemy.orm import DeclarativeBase
+
+
+class Base(DeclarativeBase):
+    pass
+
+from app.models.user import User
+from app.models.patient_profiles import PatientProfile
+from app.models.diagnosis import Diagnosis
+from app.models.manual_entry import ManualEntry
+from app.models.allergy import Allergy
+from app.models.lab_report import LabReport
+from app.models.lab_report_result import LabReportResult
+from app.models.medication import Medication
+from app.models.prescription import Prescription
+from app.models.prescription_item import PrescriptionItem
+from app.models.hospital_record import HospitalRecord
+from app.models.vital_sign import VitalSign
+from app.models.wearable_data import WearableData
+from app.models.vaccination import Vaccination                      
