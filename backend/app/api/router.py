@@ -10,6 +10,7 @@ from app.api.prescription import router as prescription_router
 from app.api.prescripton import router as prescription_item_router
 from app.api.lab_report import router as lab_report_router
 from app.api.lab_report_result import router as lab_report_results_router
+from app.api.hospital_record import router as hospital_record_router
 
 api_router = APIRouter()
 
@@ -23,3 +24,4 @@ api_router.include_router(prescription_router)
 api_router.include_router(prescription_item_router)
 api_router.include_router(lab_report_router)
 api_router.include_router(lab_report_results_router)
+api_router.include_router(hospital_record_router)
