@@ -55,7 +55,6 @@ class LabResultStatus(str, Enum):
     NORMAL = "Normal"
     HIGH = "High"
     CRITICAL = "Critical"
-from enum import Enum
 
 
 class MedicationDosageForm(str, Enum):
@@ -106,3 +105,22 @@ class DataSource(str, Enum):
     WHOOP = "whoop"
     API = "api"
     OTHER = "other"
+    
+class DiagnosisStatus(str, Enum):
+    ACTIVE = "active"
+    RESOLVED = "resolved"
+    CHRONIC = "chronic"
+
+
+class SeverityLevel(str, Enum):
+    MILD = "mild"
+    MODERATE = "moderate"
+    SEVERE = "severe"
+
+
+class RecordSource(str, Enum):
+    MANUAL = "manual"
+    HOSPITAL = "hospital"
+    LAB = "lab"
+    WEARABLE = "wearable"
+    AI = "ai"

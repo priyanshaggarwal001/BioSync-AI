@@ -1,5 +1,10 @@
 from datetime import date, datetime
 from uuid import UUID
+from app.common.enums import (
+    DiagnosisStatus,
+    SeverityLevel,
+    RecordSource,
+)
 
 from pydantic import BaseModel, ConfigDict
 
@@ -9,10 +14,10 @@ class DiagnosisBase(BaseModel):
     diagnosis_name: str
     icd10_code: str | None = None
     diagnosis_date: date | None = None
-    severity: str | None = None
-    status: str = "active"
+    severity: SeverityLevel | None = None
+    status: DiagnosisStatus = DiagnosisStatus.ACTIVE
     diagnosed_by: str | None = None
-    source: str
+    source: RecordSource
     notes: str | None = None
     hospital_record_id: UUID | None = None
 
@@ -25,10 +30,10 @@ class DiagnosisUpdate(BaseModel):
     diagnosis_name: str | None = None
     icd10_code: str | None = None
     diagnosis_date: date | None = None
-    severity: str | None = None
-    status: str | None = None
+    severity: SeverityLevel | None = None
+    status: DiagnosisStatus | None = None
     diagnosed_by: str | None = None
-    source: str | None = None
+    source: RecordSource | None = None
     notes: str | None = None
     hospital_record_id: UUID | None = None
 
