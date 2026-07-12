@@ -8,6 +8,8 @@ from app.api.allergy import router as allergy_router
 from app.api.medication import router as medication_router
 from app.api.prescription import router as prescription_router
 from app.api.prescripton import router as prescription_item_router
+from app.api.lab_report import router as lab_report_router
+from app.api.lab_report_result import router as lab_report_results_router
 
 api_router = APIRouter()
 
@@ -19,3 +21,5 @@ api_router.include_router(allergy_router)
 api_router.include_router(medication_router)
 api_router.include_router(prescription_router)
 api_router.include_router(prescription_item_router)
+api_router.include_router(lab_report_router)
+api_router.include_router(lab_report_results_router)
