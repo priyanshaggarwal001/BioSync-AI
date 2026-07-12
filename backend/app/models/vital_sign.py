@@ -1,9 +1,9 @@
 from __future__ import annotations
-
+import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Float, ForeignKey, String
+from sqlalchemy import DateTime, Float, ForeignKey, String, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
@@ -20,11 +20,12 @@ class VitalSign(Base, BaseModel):
 
     __tablename__ = "vital_signs"
 
-    patient_profile_id: Mapped[str] = mapped_column(
-        ForeignKey("patient_profiles.id", ondelete="CASCADE"),
-        nullable=False,
-        index=True,
-    )
+    patient_profile_id: Mapped[uuid.UUID] = mapped_column(
+    UUID(as_uuid=True),
+    ForeignKey("patient_profiles.id", ondelete="CASCADE"),
+    nullable=False,
+    index=True,
+)
 
     recorded_at: Mapped[datetime] = mapped_column(
         DateTime,
