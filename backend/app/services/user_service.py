@@ -1,9 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from app.auth.hashing import hash_password
 from app.common.base_service import BaseService
 from app.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
+from app.auth.hashing import verify_password
+from app.models import user
 
 
 class UserService(BaseService[User]):
@@ -28,7 +30,7 @@ class UserService(BaseService[User]):
 
         user = User(
     email=user_data.email,
-    password_hash=user_data.password,
+    password_hash=hash_password(user_data.password)
 )
 
         return self.create(db, user)
@@ -47,6 +49,18 @@ class UserService(BaseService[User]):
             user,
             updates,
         )
+    def authenticate_user(
+        self,
+        db: Session,
+        email: str,
+        password: str,
+    ) -> User | None:
 
+        user = self.get_by_email(db, email)
+
+        if user and verify_password(password, user.password_hash):
+            return user
+
+        return None
 
 user_service = UserService()

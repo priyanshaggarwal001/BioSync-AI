@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from app.models.user import User
 from app.common.base_service import BaseService
 from app.models.patient_profiles import PatientProfile
 from app.schemas.patient_profile import (
@@ -30,11 +30,13 @@ class PatientProfileService(BaseService[PatientProfile]):
     def create_profile(
         self,
         db: Session,
+        user: User,
         profile_data: PatientProfileCreate,
     ) -> PatientProfile:
 
         profile = PatientProfile(
-            **profile_data.model_dump()
+            user_id=user.id,
+            **profile_data.model_dump(),
         )
 
         return self.create(

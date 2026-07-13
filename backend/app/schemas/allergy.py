@@ -7,7 +7,6 @@ from app.common.enums import AllergySeverity, AllergyType
 
 
 class AllergyBase(BaseModel):
-    patient_id: UUID
     allergy_name: str
     allergy_type: AllergyType
     severity: AllergySeverity
@@ -33,6 +32,7 @@ class AllergyUpdate(BaseModel):
 
 class AllergyResponse(AllergyBase):
     id: UUID
+    patient_id: UUID
     created_at: datetime
     updated_at: datetime
 

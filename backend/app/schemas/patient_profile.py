@@ -8,7 +8,6 @@ from app.common.enums import BloodGroup, Gender
 
 
 class PatientProfileBase(BaseModel):
-    user_id: UUID
     first_name: str
     last_name: str
     date_of_birth: date
@@ -36,10 +35,11 @@ class PatientProfileUpdate(BaseModel):
     weight_kg: Decimal | None = None
     emergency_contact_name: str | None = None
     emergency_contact_phone: str | None = None
-
+    
 
 class PatientProfileResponse(PatientProfileBase):
     id: UUID
+    user_id: UUID
     created_at: datetime
     updated_at: datetime
 

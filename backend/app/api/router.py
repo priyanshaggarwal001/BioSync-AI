@@ -13,6 +13,8 @@ from app.api.lab_report_result import router as lab_report_results_router
 from app.api.hospital_record import router as hospital_record_router
 from app.api.vital_sign import router as vital_sign_router
 from app.api.wearable_data import router as wearable_data_router
+from app.api.vaccination import router as vaccination_router
+from app.api.auth import router as auth_router
 
 api_router = APIRouter()
 
@@ -29,3 +31,5 @@ api_router.include_router(lab_report_results_router)
 api_router.include_router(hospital_record_router)
 api_router.include_router(vital_sign_router)
 api_router.include_router(wearable_data_router)
+api_router.include_router(vaccination_router)
+api_router.include_router(auth_router)

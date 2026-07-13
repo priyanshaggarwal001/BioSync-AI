@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_db
+from app.auth.dependencies import get_current_patient
+from app.models.patient_profiles import PatientProfile
 from app.schemas.allergy import (
     AllergyCreate,
     AllergyResponse,
@@ -24,10 +26,12 @@ router = APIRouter(
 )
 def create_allergy(
     allergy_data: AllergyCreate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
     return allergy_service.create_allergy(
         db,
+        patient,
         allergy_data,
     )
 
@@ -37,9 +41,13 @@ def create_allergy(
     response_model=list[AllergyResponse],
 )
 def get_allergies(
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return allergy_service.get_all(db)
+    return allergy_service.get_patient_allergies(
+        db,
+        patient.id,
+    )
 
 
 @router.get(
@@ -48,10 +56,12 @@ def get_allergies(
 )
 def get_allergy(
     allergy_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    allergy = allergy_service.get_by_id(
+    allergy = allergy_service.get_patient_allergy(
         db,
+        patient.id,
         allergy_id,
     )
 
@@ -71,10 +81,12 @@ def get_allergy(
 def update_allergy(
     allergy_id: UUID,
     allergy_data: AllergyUpdate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    allergy = allergy_service.get_by_id(
+    allergy = allergy_service.get_patient_allergy(
         db,
+        patient.id,
         allergy_id,
     )
 
@@ -97,10 +109,12 @@ def update_allergy(
 )
 def delete_allergy(
     allergy_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    allergy = allergy_service.get_by_id(
+    allergy = allergy_service.get_patient_allergy(
         db,
+        patient.id,
         allergy_id,
     )
 
@@ -114,4 +128,3 @@ def delete_allergy(
         db,
         allergy,
     )
-    

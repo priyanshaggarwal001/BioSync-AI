@@ -10,7 +10,8 @@ from app.schemas.patient_profile import (
     PatientProfileUpdate,
 )
 from app.services.patient_profile_service import patient_profile_service
-
+from app.auth.dependencies import get_current_user
+from app.models.user import User
 
 router = APIRouter(
     prefix="/patient-profiles",
@@ -26,11 +27,12 @@ router = APIRouter(
 def create_patient_profile(
     profile_data: PatientProfileCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     existing = patient_profile_service.get_by_user_id(
-        db,
-        profile_data.user_id,
-    )
+    db,
+    current_user.id,
+)
 
     if existing:
         raise HTTPException(
@@ -39,9 +41,10 @@ def create_patient_profile(
         )
 
     return patient_profile_service.create_profile(
-        db,
-        profile_data,
-    )
+    db,
+    current_user,
+    profile_data,
+)
 
 
 @router.get(

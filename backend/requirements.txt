@@ -19,3 +19,6 @@ email-validator
 
 pytest
 psycopg2-binary
+
+pwdlib[argon2]
+
