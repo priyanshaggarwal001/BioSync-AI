@@ -2,7 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-
+from app.models.patient_profiles import PatientProfile
 from app.api.dependencies import get_db
 from app.schemas.diagnosis import (
     DiagnosisCreate,
@@ -10,6 +10,7 @@ from app.schemas.diagnosis import (
     DiagnosisUpdate,
 )
 from app.services.diagnosis_service import diagnosis_service
+from app.auth.dependencies import get_current_patient
 
 router = APIRouter(
     prefix="/diagnoses",
@@ -24,11 +25,13 @@ router = APIRouter(
 )
 def create_diagnosis(
     diagnosis_data: DiagnosisCreate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
     return diagnosis_service.create_diagnosis(
         db,
-        diagnosis_data,
+        patient,
+        diagnosis_data
     )
 
 
@@ -37,9 +40,10 @@ def create_diagnosis(
     response_model=list[DiagnosisResponse],
 )
 def get_diagnoses(
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return diagnosis_service.get_all(db)
+    return diagnosis_service.get_patient_diagnoses(db, patient.id)
 
 
 @router.get(
@@ -48,10 +52,12 @@ def get_diagnoses(
 )
 def get_diagnosis(
     diagnosis_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    diagnosis = diagnosis_service.get_by_id(
+    diagnosis = diagnosis_service.get_patient_diagnosis(
         db,
+        patient.id,
         diagnosis_id,
     )
 
@@ -71,10 +77,12 @@ def get_diagnosis(
 def update_diagnosis(
     diagnosis_id: UUID,
     diagnosis_data: DiagnosisUpdate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    diagnosis = diagnosis_service.get_by_id(
+    diagnosis = diagnosis_service.get_patient_diagnosis(
         db,
+        patient.id,
         diagnosis_id,
     )
 
@@ -97,10 +105,12 @@ def update_diagnosis(
 )
 def delete_diagnosis(
     diagnosis_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    diagnosis = diagnosis_service.get_by_id(
+    diagnosis = diagnosis_service.get_patient_diagnosis(
         db,
+        patient.id,
         diagnosis_id,
     )
 

@@ -10,7 +10,6 @@ from pydantic import BaseModel, ConfigDict
 
 
 class DiagnosisBase(BaseModel):
-    patient_id: UUID
     diagnosis_name: str
     icd10_code: str | None = None
     diagnosis_date: date | None = None
@@ -40,6 +39,7 @@ class DiagnosisUpdate(BaseModel):
 
 class DiagnosisResponse(DiagnosisBase):
     id: UUID
+    patient_id: UUID
     created_at: datetime
     updated_at: datetime
 

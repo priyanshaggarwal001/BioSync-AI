@@ -88,7 +88,7 @@ def update_allergy(
         db,
         patient.id,
         allergy_id,
-    )
+)
 
     if not allergy:
         raise HTTPException(

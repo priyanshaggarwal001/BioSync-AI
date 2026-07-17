@@ -5,7 +5,6 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 class VitalSignBase(BaseModel):
-    patient_profile_id: UUID
     recorded_at: datetime
     source: str
     systolic_bp: float | None = None
@@ -40,5 +39,5 @@ class VitalSignUpdate(BaseModel):
 
 class VitalSignResponse(VitalSignBase):
     id: UUID
-
+    patient_id: UUID
     model_config = ConfigDict(from_attributes=True)

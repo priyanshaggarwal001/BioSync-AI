@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict
 
 
 class VaccinationBase(BaseModel):
-    patient_profile_id: UUID
     vaccine_name: str
     manufacturer: str | None = None
     dose_number: int | None = None
@@ -37,5 +36,5 @@ class VaccinationUpdate(BaseModel):
 
 class VaccinationResponse(VaccinationBase):
     id: UUID
-
+    patient_profile_id: UUID
     model_config = ConfigDict(from_attributes=True)

@@ -13,7 +13,6 @@ from app.common.enums import (
 
 
 class MedicationBase(BaseModel):
-    patient_id: UUID
     medication_name: str
     generic_name: str | None = None
     brand_name: str | None = None
@@ -49,5 +48,6 @@ class MedicationUpdate(BaseModel):
 
 class MedicationResponse(MedicationBase):
     id: UUID
+    patient_id: UUID
 
     model_config = ConfigDict(from_attributes=True)
