@@ -12,7 +12,6 @@ from app.common.enums import (
 
 
 class LabReportBase(BaseModel):
-    patient_id: UUID
     report_name: str
     category: LabReportCategory
     laboratory_name: str | None = None
@@ -42,5 +41,5 @@ class LabReportUpdate(BaseModel):
 
 class LabReportResponse(LabReportBase):
     id: UUID
-
+    patient_id: UUID
     model_config = ConfigDict(from_attributes=True)

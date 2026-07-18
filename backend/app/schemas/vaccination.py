@@ -36,5 +36,5 @@ class VaccinationUpdate(BaseModel):
 
 class VaccinationResponse(VaccinationBase):
     id: UUID
-    patient_profile_id: UUID
+    patient_id: UUID
     model_config = ConfigDict(from_attributes=True)

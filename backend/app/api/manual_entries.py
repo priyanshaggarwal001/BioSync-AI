@@ -4,6 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_db
+from app.auth.dependencies import get_current_patient
+from app.models.patient_profiles import PatientProfile
 from app.schemas.manual_entry import (
     ManualEntryCreate,
     ManualEntryResponse,
@@ -24,11 +26,15 @@ router = APIRouter(
 )
 def create_manual_entry(
     entry_data: ManualEntryCreate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
     return manual_entry_service.create_entry(
         db,
+        patient,
         entry_data,
+        
+        
     )
 
 
@@ -37,9 +43,13 @@ def create_manual_entry(
     response_model=list[ManualEntryResponse],
 )
 def get_manual_entries(
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return manual_entry_service.get_all(db)
+    return manual_entry_service.get_user_entries(
+        db,
+        patient.id,
+    )
 
 
 @router.get(
@@ -48,16 +58,18 @@ def get_manual_entries(
 )
 def get_manual_entry(
     entry_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    entry = manual_entry_service.get_by_id(
+    entry = manual_entry_service.get_user_entry(
         db,
+        patient.id,
         entry_id,
     )
 
     if not entry:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Manual entry not found.",
         )
 
@@ -71,16 +83,18 @@ def get_manual_entry(
 def update_manual_entry(
     entry_id: UUID,
     entry_data: ManualEntryUpdate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    entry = manual_entry_service.get_by_id(
+    entry = manual_entry_service.get_user_entry(
         db,
+        patient.id,
         entry_id,
     )
 
     if not entry:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Manual entry not found.",
         )
 
@@ -97,16 +111,18 @@ def update_manual_entry(
 )
 def delete_manual_entry(
     entry_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    entry = manual_entry_service.get_by_id(
+    entry = manual_entry_service.get_user_entry(
         db,
+        patient.id,
         entry_id,
     )
 
     if not entry:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Manual entry not found.",
         )
 

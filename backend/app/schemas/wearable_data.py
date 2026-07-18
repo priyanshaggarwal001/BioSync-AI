@@ -9,7 +9,6 @@ from app.common.enums import DataSource
 
 
 class WearableDataBase(BaseModel):
-    patient_profile_id: UUID
     recorded_at: datetime
     source: DataSource
     steps: int | None = None
@@ -47,5 +46,5 @@ class WearableDataUpdate(BaseModel):
 
 class WearableDataResponse(WearableDataBase):
     id: UUID
-
+    patient_id: UUID
     model_config = ConfigDict(from_attributes=True)

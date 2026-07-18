@@ -44,8 +44,3 @@ class User(Base, BaseModel):
         cascade="all, delete-orphan",
         uselist=False,
     )
-
-    manual_entries: Mapped[list["ManualEntry"]] = relationship(
-        back_populates="user",
-        cascade="all, delete-orphan",
-    )

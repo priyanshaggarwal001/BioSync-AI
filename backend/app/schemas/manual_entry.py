@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict
 
 
 class ManualEntryBase(BaseModel):
-    user_id: UUID
     metric_name: str
     metric_value: Decimal
     unit: str | None = None
@@ -30,6 +29,7 @@ class ManualEntryUpdate(BaseModel):
 
 class ManualEntryResponse(ManualEntryBase):
     id: UUID
+    user_id: UUID
     created_at: datetime
     updated_at: datetime
 

@@ -7,7 +7,7 @@ from app.api.diagnosis import router as diagnosis_router
 from app.api.allergy import router as allergy_router
 from app.api.medication import router as medication_router
 from app.api.prescription import router as prescription_router
-from app.api.prescripton import router as prescription_item_router
+from app.api.prescripton_item import router as prescription_item_router
 from app.api.lab_report import router as lab_report_router
 from app.api.lab_report_result import router as lab_report_results_router
 from app.api.hospital_record import router as hospital_record_router

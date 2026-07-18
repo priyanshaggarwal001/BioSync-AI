@@ -13,6 +13,7 @@ from app.models.base_model import BaseModel
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.patient_profiles import PatientProfile
 
 
 class ManualEntry(Base,BaseModel):
@@ -20,9 +21,9 @@ class ManualEntry(Base,BaseModel):
 
    
 
-    user_id: Mapped[uuid.UUID] = mapped_column(
+    patient_id: Mapped[uuid.UUID] = mapped_column(
     UUID(as_uuid=True),
-    ForeignKey("users.id", ondelete="CASCADE"),
+    ForeignKey("patient_profiles.id", ondelete="CASCADE"),
     nullable=False,
 )
 
@@ -39,6 +40,6 @@ class ManualEntry(Base,BaseModel):
     recorded_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     
-    user: Mapped["User"] = relationship(
+    patient: Mapped["PatientProfile"] = relationship(
     back_populates="manual_entries"
 )

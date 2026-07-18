@@ -30,8 +30,9 @@ def create_diagnosis(
 ):
     return diagnosis_service.create_diagnosis(
         db,
-        patient,
-        diagnosis_data
+        diagnosis_data,
+        patient
+        
     )
 
 

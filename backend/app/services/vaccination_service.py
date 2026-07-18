@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -31,24 +33,11 @@ class VaccinationService(BaseService[Vaccination]):
             vaccination,
         )
 
-    def update_vaccination(
-        self,
-        db: Session,
-        vaccination: Vaccination,
-        vaccination_data: VaccinationUpdate,
-    ) -> Vaccination:
-
-        return self.update(
-            db,
-            vaccination,
-            vaccination_data.model_dump(exclude_unset=True),
-        )
-
     def get_patient_vaccination(
         self,
         db: Session,
-        patient_id,
-        vaccination_id,
+        patient_id: UUID,
+        vaccination_id: UUID,
     ) -> Vaccination | None:
 
         statement = (
@@ -64,7 +53,7 @@ class VaccinationService(BaseService[Vaccination]):
     def get_patient_vaccinations(
         self,
         db: Session,
-        patient_id,
+        patient_id: UUID,
     ) -> list[Vaccination]:
 
         statement = (
@@ -73,6 +62,23 @@ class VaccinationService(BaseService[Vaccination]):
         )
 
         return list(db.scalars(statement).all())
+
+    def update_vaccination(
+        self,
+        db: Session,
+        vaccination: Vaccination,
+        vaccination_data: VaccinationUpdate,
+    ) -> Vaccination:
+
+        updates = vaccination_data.model_dump(
+            exclude_unset=True
+        )
+
+        return self.update(
+            db,
+            vaccination,
+            updates,
+        )
 
 
 vaccination_service = VaccinationService()

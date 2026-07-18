@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict
 
 
 class HospitalRecordBase(BaseModel):
-    patient_profile_id: UUID
     hospital_name: str
     doctor_name: str | None = None
     visit_date: date
@@ -35,5 +34,5 @@ class HospitalRecordUpdate(BaseModel):
 
 class HospitalRecordResponse(HospitalRecordBase):
     id: UUID
-
+    patient_id: UUID
     model_config = ConfigDict(from_attributes=True)

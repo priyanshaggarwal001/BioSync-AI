@@ -26,7 +26,7 @@ class HospitalRecord(Base, BaseModel):
 
     __tablename__ = "hospital_records"
 
-    patient_profile_id: Mapped[uuid.UUID] = mapped_column(
+    patient_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("patient_profiles.id", ondelete="CASCADE"),
         nullable=False,

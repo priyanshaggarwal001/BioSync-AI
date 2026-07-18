@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
+from datetime import date
 
 from app.common.enums import PrescriptionStatus
 
 
 class PrescriptionBase(BaseModel):
-    patient_id: UUID
     doctor_name: str
     prescription_date: date
     diagnosis: str | None = None
@@ -35,5 +35,7 @@ class PrescriptionUpdate(BaseModel):
 
 class PrescriptionResponse(PrescriptionBase):
     id: UUID
-
+    patient_id: UUID
+    created_at: datetime
+    updated_at: datetime
     model_config = ConfigDict(from_attributes=True)

@@ -3,39 +3,39 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.api.dependencies import get_db
+from app.database.session import get_db
 from app.auth.dependencies import get_current_patient
 from app.models.patient_profiles import PatientProfile
-from app.schemas.lab_report_result import (
-    LabReportResultCreate,
-    LabReportResultResponse,
-    LabReportResultUpdate,
+from app.schemas.prescription_item import (
+    PrescriptionItemCreate,
+    PrescriptionItemResponse,
+    PrescriptionItemUpdate,
 )
-from app.services.lab_report_result_service import (
-    lab_report_result_service,
+from app.services.prescription_item_service import (
+    prescription_item_service,
 )
 
 router = APIRouter(
-    prefix="/lab-report-results",
-    tags=["Lab Report Results"],
+    prefix="/prescription-items",
+    tags=["Prescription Items"],
 )
 
 
 @router.post(
     "/",
-    response_model=LabReportResultResponse,
+    response_model=PrescriptionItemResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_lab_report_result(
-    result_data: LabReportResultCreate,
+def create_prescription_item(
+    item_data: PrescriptionItemCreate,
     patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
     try:
-        return lab_report_result_service.create_lab_report_result(
+        return prescription_item_service.create_prescription_item(
             db,
             patient,
-            result_data,
+            item_data,
             
             
         )
@@ -48,93 +48,93 @@ def create_lab_report_result(
 
 @router.get(
     "/",
-    response_model=list[LabReportResultResponse],
+    response_model=list[PrescriptionItemResponse],
 )
-def get_lab_report_results(
+def get_prescription_items(
     patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return lab_report_result_service.get_lab_report_results(
+    return prescription_item_service.get_prescription_items(
         db,
         patient.id,
     )
 
 
 @router.get(
-    "/{result_id}",
-    response_model=LabReportResultResponse,
+    "/{item_id}",
+    response_model=PrescriptionItemResponse,
 )
-def get_lab_report_result(
-    result_id: UUID,
+def get_prescription_item(
+    item_id: UUID,
     patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    result = lab_report_result_service.get_lab_report_result(
+    item = prescription_item_service.get_prescription_item(
         db,
         patient.id,
-        result_id,
+        item_id,
     )
 
-    if not result:
+    if not item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lab report result not found.",
+            detail="Prescription item not found.",
         )
 
-    return result
+    return item
 
 
 @router.put(
-    "/{result_id}",
-    response_model=LabReportResultResponse,
+    "/{item_id}",
+    response_model=PrescriptionItemResponse,
 )
-def update_lab_report_result(
-    result_id: UUID,
-    result_data: LabReportResultUpdate,
+def update_prescription_item(
+    item_id: UUID,
+    item_data: PrescriptionItemUpdate,
     patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    result = lab_report_result_service.get_lab_report_result(
+    item = prescription_item_service.get_prescription_item(
         db,
         patient.id,
-        result_id,
+        item_id,
     )
 
-    if not result:
+    if not item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lab report result not found.",
+            detail="Prescription item not found.",
         )
 
-    return lab_report_result_service.update_lab_report_result(
+    return prescription_item_service.update_prescription_item(
         db,
-        result,
-        result_data,
+        item,
+        item_data,
     )
 
 
 @router.delete(
-    "/{result_id}",
+    "/{item_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_lab_report_result(
-    result_id: UUID,
+def delete_prescription_item(
+    item_id: UUID,
     patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    result = lab_report_result_service.get_lab_report_result(
+    item = prescription_item_service.get_prescription_item(
         db,
         patient.id,
-        result_id,
+        item_id,
     )
 
-    if not result:
+    if not item:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Lab report result not found.",
+            detail="Prescription item not found.",
         )
 
-    lab_report_result_service.delete(
+    prescription_item_service.delete(
         db,
-        result,
+        item,
     )

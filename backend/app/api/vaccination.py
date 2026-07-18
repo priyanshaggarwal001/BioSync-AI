@@ -31,8 +31,10 @@ def create_vaccination(
 ):
     return vaccination_service.create_vaccination(
         db,
-        patient,
+        patient.
         vaccination,
+        
+        
     )
 
 

@@ -1,16 +1,19 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.database.session import get_db
-from app.models.prescription import Prescription
+from app.api.dependencies import get_db
+from app.auth.dependencies import get_current_patient
+from app.models.patient_profiles import PatientProfile
 from app.schemas.prescription import (
     PrescriptionCreate,
     PrescriptionResponse,
     PrescriptionUpdate,
 )
-from app.services.prescription_service import prescription_service
+from app.services.prescription_service import (
+    prescription_service,
+)
 
 router = APIRouter(
     prefix="/prescriptions",
@@ -18,55 +21,114 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=PrescriptionResponse)
+@router.post(
+    "/",
+    response_model=PrescriptionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_prescription(
-    prescription: PrescriptionCreate,
+    prescription_data: PrescriptionCreate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    prescription_obj = Prescription(**prescription.model_dump())
-    return prescription_service.create(db, prescription_obj)
+    return prescription_service.create_prescription(
+        db,
+        patient,
+        prescription_data,
+        
+        
+    )
 
 
-@router.get("/", response_model=list[PrescriptionResponse])
+@router.get(
+    "/",
+    response_model=list[PrescriptionResponse],
+)
 def get_prescriptions(
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return prescription_service.get_all(db)
+    return prescription_service.get_patient_prescriptions(
+        db,
+        patient.id,
+    )
 
 
-@router.get("/{prescription_id}", response_model=PrescriptionResponse)
+@router.get(
+    "/{prescription_id}",
+    response_model=PrescriptionResponse,
+)
 def get_prescription(
     prescription_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return prescription_service.get_by_id(
+    prescription = prescription_service.get_patient_prescription(
         db,
+        patient.id,
         prescription_id,
     )
 
+    if not prescription:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prescription not found.",
+        )
 
-@router.put("/{prescription_id}", response_model=PrescriptionResponse)
+    return prescription
+
+
+@router.put(
+    "/{prescription_id}",
+    response_model=PrescriptionResponse,
+)
 def update_prescription(
     prescription_id: UUID,
-    prescription: PrescriptionUpdate,
+    prescription_data: PrescriptionUpdate,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    return prescription_service.update(
+    prescription = prescription_service.get_patient_prescription(
         db,
+        patient.id,
         prescription_id,
-        prescription.model_dump(exclude_unset=True),
+    )
+
+    if not prescription:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prescription not found.",
+        )
+
+    return prescription_service.update_prescription(
+        db,
+        prescription,
+        prescription_data,
     )
 
 
-@router.delete("/{prescription_id}")
+@router.delete(
+    "/{prescription_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 def delete_prescription(
     prescription_id: UUID,
+    patient: PatientProfile = Depends(get_current_patient),
     db: Session = Depends(get_db),
 ):
-    prescription_service.delete(
+    prescription = prescription_service.get_patient_prescription(
         db,
+        patient.id,
         prescription_id,
     )
-    return {
-        "message": "Prescription deleted successfully"
-    }
+
+    if not prescription:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Prescription not found.",
+        )
+
+    prescription_service.delete(
+        db,
+        prescription,
+    )

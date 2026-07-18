@@ -20,6 +20,8 @@ from app.models.base_model import BaseModel
 from app.common.enums import Gender, BloodGroup
 from typing import TYPE_CHECKING
 
+
+
 if TYPE_CHECKING:
     from app.models.allergy import Allergy
     from app.models.lab_report import LabReport
@@ -31,6 +33,7 @@ if TYPE_CHECKING:
     from app.models.vital_sign import VitalSign
     from app.models.wearable_data import WearableData
     from app.models.vaccination import Vaccination
+    from app.models.manual_entry import ManualEntry
 
 class PatientProfile(Base, BaseModel):
     """
@@ -136,5 +139,9 @@ class PatientProfile(Base, BaseModel):
     )
     vaccinations: Mapped[list["Vaccination"]] = relationship(
     back_populates="patient_profile",
+    cascade="all, delete-orphan",
+    )
+    manual_entries: Mapped[list["ManualEntry"]] = relationship(
+    back_populates="patient",
     cascade="all, delete-orphan",
 )

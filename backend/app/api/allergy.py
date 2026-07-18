@@ -33,6 +33,8 @@ def create_allergy(
         db,
         patient,
         allergy_data,
+        
+        
     )
 
 

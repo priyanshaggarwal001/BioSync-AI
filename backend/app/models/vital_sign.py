@@ -20,12 +20,12 @@ class VitalSign(Base, BaseModel):
 
     __tablename__ = "vital_signs"
 
-    patient_profile_id: Mapped[uuid.UUID] = mapped_column(
-    UUID(as_uuid=True),
-    ForeignKey("patient_profiles.id", ondelete="CASCADE"),
-    nullable=False,
-    index=True,
-)
+    patient_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("patient_profiles.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
 
     recorded_at: Mapped[datetime] = mapped_column(
         DateTime,

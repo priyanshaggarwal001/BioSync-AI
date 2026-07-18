@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: 31b59304eb58
+Revision ID: bcd4b9c3743e
 Revises: 
-Create Date: 2026-07-10 23:53:47.970531
+Create Date: 2026-07-18 14:15:26.019311
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '31b59304eb58'
+revision: str = 'bcd4b9c3743e'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -31,20 +31,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
-    op.create_table('manual_entries',
-    sa.Column('user_id', sa.UUID(), nullable=False),
-    sa.Column('metric_name', sa.String(length=100), nullable=False),
-    sa.Column('metric_value', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('unit', sa.String(length=30), nullable=True),
-    sa.Column('category', sa.String(length=50), nullable=False),
-    sa.Column('notes', sa.Text(), nullable=True),
-    sa.Column('recorded_at', sa.DateTime(timezone=True), nullable=False),
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('patient_profiles',
     sa.Column('user_id', sa.UUID(), nullable=False),
     sa.Column('first_name', sa.String(length=100), nullable=False),
@@ -81,7 +67,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_allergies_patient_id'), 'allergies', ['patient_id'], unique=False)
     op.create_table('hospital_records',
-    sa.Column('patient_profile_id', sa.UUID(), nullable=False),
+    sa.Column('patient_id', sa.UUID(), nullable=False),
     sa.Column('hospital_name', sa.String(length=255), nullable=False),
     sa.Column('doctor_name', sa.String(length=255), nullable=True),
     sa.Column('visit_date', sa.Date(), nullable=False),
@@ -93,10 +79,24 @@ def upgrade() -> None:
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['patient_profile_id'], ['patient_profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['patient_id'], ['patient_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_hospital_records_patient_profile_id'), 'hospital_records', ['patient_profile_id'], unique=False)
+    op.create_index(op.f('ix_hospital_records_patient_id'), 'hospital_records', ['patient_id'], unique=False)
+    op.create_table('manual_entries',
+    sa.Column('patient_id', sa.UUID(), nullable=False),
+    sa.Column('metric_name', sa.String(length=100), nullable=False),
+    sa.Column('metric_value', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('unit', sa.String(length=30), nullable=True),
+    sa.Column('category', sa.String(length=50), nullable=False),
+    sa.Column('notes', sa.Text(), nullable=True),
+    sa.Column('recorded_at', sa.DateTime(timezone=True), nullable=False),
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.ForeignKeyConstraint(['patient_id'], ['patient_profiles.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('medications',
     sa.Column('patient_id', sa.UUID(), nullable=False),
     sa.Column('medication_name', sa.String(length=150), nullable=False),
@@ -119,7 +119,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_medications_patient_id'), 'medications', ['patient_id'], unique=False)
     op.create_table('vaccinations',
-    sa.Column('patient_profile_id', sa.UUID(), nullable=False),
+    sa.Column('patient_id', sa.UUID(), nullable=False),
     sa.Column('vaccine_name', sa.String(length=150), nullable=False),
     sa.Column('manufacturer', sa.String(length=100), nullable=True),
     sa.Column('dose_number', sa.Integer(), nullable=True),
@@ -132,12 +132,12 @@ def upgrade() -> None:
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['patient_profile_id'], ['patient_profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['patient_id'], ['patient_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_vaccinations_patient_profile_id'), 'vaccinations', ['patient_profile_id'], unique=False)
+    op.create_index(op.f('ix_vaccinations_patient_id'), 'vaccinations', ['patient_id'], unique=False)
     op.create_table('vital_signs',
-    sa.Column('patient_profile_id', sa.UUID(), nullable=False),
+    sa.Column('patient_id', sa.UUID(), nullable=False),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('source', sa.String(length=50), nullable=False),
     sa.Column('systolic_bp', sa.Float(), nullable=True),
@@ -154,12 +154,12 @@ def upgrade() -> None:
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['patient_profile_id'], ['patient_profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['patient_id'], ['patient_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_vital_signs_patient_profile_id'), 'vital_signs', ['patient_profile_id'], unique=False)
+    op.create_index(op.f('ix_vital_signs_patient_id'), 'vital_signs', ['patient_id'], unique=False)
     op.create_table('wearable_data',
-    sa.Column('patient_profile_id', sa.UUID(), nullable=False),
+    sa.Column('patient_id', sa.UUID(), nullable=False),
     sa.Column('recorded_at', sa.DateTime(), nullable=False),
     sa.Column('source', sa.Enum('MANUAL', 'HOSPITAL', 'LAB', 'APPLE_HEALTH', 'GOOGLE_FIT', 'FITBIT', 'GARMIN', 'SAMSUNG_HEALTH', 'WHOOP', 'API', 'OTHER', name='datasource'), nullable=False),
     sa.Column('steps', sa.Integer(), nullable=True),
@@ -176,10 +176,10 @@ def upgrade() -> None:
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-    sa.ForeignKeyConstraint(['patient_profile_id'], ['patient_profiles.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['patient_id'], ['patient_profiles.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_wearable_data_patient_profile_id'), 'wearable_data', ['patient_profile_id'], unique=False)
+    op.create_index(op.f('ix_wearable_data_patient_id'), 'wearable_data', ['patient_id'], unique=False)
     op.create_table('diagnoses',
     sa.Column('patient_id', sa.UUID(), nullable=False),
     sa.Column('diagnosis_name', sa.String(length=255), nullable=False),
@@ -291,20 +291,20 @@ def downgrade() -> None:
     op.drop_table('lab_reports')
     op.drop_index(op.f('ix_diagnoses_hospital_record_id'), table_name='diagnoses')
     op.drop_table('diagnoses')
-    op.drop_index(op.f('ix_wearable_data_patient_profile_id'), table_name='wearable_data')
+    op.drop_index(op.f('ix_wearable_data_patient_id'), table_name='wearable_data')
     op.drop_table('wearable_data')
-    op.drop_index(op.f('ix_vital_signs_patient_profile_id'), table_name='vital_signs')
+    op.drop_index(op.f('ix_vital_signs_patient_id'), table_name='vital_signs')
     op.drop_table('vital_signs')
-    op.drop_index(op.f('ix_vaccinations_patient_profile_id'), table_name='vaccinations')
+    op.drop_index(op.f('ix_vaccinations_patient_id'), table_name='vaccinations')
     op.drop_table('vaccinations')
     op.drop_index(op.f('ix_medications_patient_id'), table_name='medications')
     op.drop_table('medications')
-    op.drop_index(op.f('ix_hospital_records_patient_profile_id'), table_name='hospital_records')
+    op.drop_table('manual_entries')
+    op.drop_index(op.f('ix_hospital_records_patient_id'), table_name='hospital_records')
     op.drop_table('hospital_records')
     op.drop_index(op.f('ix_allergies_patient_id'), table_name='allergies')
     op.drop_table('allergies')
     op.drop_table('patient_profiles')
-    op.drop_table('manual_entries')
     op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
     # ### end Alembic commands ###
