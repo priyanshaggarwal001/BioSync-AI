@@ -50,13 +50,25 @@ def create_patient_profile(
 
 
 @router.get(
-    "/",
-    response_model=list[PatientProfileResponse],
+    "/me",
+    response_model=PatientProfileResponse,
 )
-def get_patient_profiles(
+def get_my_patient_profile(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    return patient_profile_service.get_all(db)
+    profile = patient_profile_service.get_by_user_id(
+        db,
+        current_user.id,
+    )
+
+    if not profile:
+        raise HTTPException(
+            status_code=404,
+            detail="Patient profile not found.",
+        )
+
+    return profile
 
 
 @router.get(
@@ -66,6 +78,7 @@ def get_patient_profiles(
 def get_patient_profile(
     profile_id: UUID,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     profile = patient_profile_service.get_by_id(
         db,
@@ -76,6 +89,12 @@ def get_patient_profile(
         raise HTTPException(
             status_code=404,
             detail="Patient profile not found.",
+        )
+
+    if profile.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized to access this profile.",
         )
 
     return profile
@@ -89,6 +108,7 @@ def update_patient_profile(
     profile_id: UUID,
     profile_data: PatientProfileUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     profile = patient_profile_service.get_by_id(
         db,
@@ -101,12 +121,17 @@ def update_patient_profile(
             detail="Patient profile not found.",
         )
 
+    if profile.user_id != current_user.id:
+        raise HTTPException(
+            status_code=403,
+            detail="You are not authorized to update this profile.",
+        )
+
     return patient_profile_service.update_profile(
         db,
         profile,
         profile_data,
     )
-
 
 @router.delete(
     "/{profile_id}",
@@ -115,6 +140,7 @@ def update_patient_profile(
 def delete_patient_profile(
     profile_id: UUID,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     profile = patient_profile_service.get_by_id(
         db,

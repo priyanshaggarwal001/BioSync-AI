@@ -30,6 +30,21 @@ class DiagnosisService(BaseService[Diagnosis]):
             )
 
             return db.scalar(statement)
+    
+    def get_patient_diagnoses(
+        self,
+        db: Session,
+        patient_id,
+    ) -> list[Diagnosis]:
+
+            statement = (
+                select(Diagnosis)
+                .where(
+                    Diagnosis.patient_id == patient_id,
+                )
+            )
+
+            return db.scalars(statement).all()
 
     def create_diagnosis(
         self,
