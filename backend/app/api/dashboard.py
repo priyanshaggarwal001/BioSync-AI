@@ -9,6 +9,7 @@ from app.services.dashboard_service import dashboard_service
 from app.services.trend_service import trend_service
 from app.services.insight_service import insight_service
 from app.services.baseline_service import baseline_service
+from app.services.ai_service import ai_service
 router = APIRouter(
     prefix="/dashboard",
     tags=["Dashboard"],
@@ -62,4 +63,23 @@ def get_dashboard_baseline(
     return baseline_service.get_wearable_baseline(
         db,
         patient,
+    )
+
+@router.get(
+    "/ai-summary",
+)
+async def get_dashboard_ai_summary(
+
+    patient: PatientProfile = Depends(get_current_patient),
+
+    db: Session = Depends(get_db),
+
+):
+
+    return await ai_service.generate_health_summary(
+
+        db,
+
+        patient,
+
     )
