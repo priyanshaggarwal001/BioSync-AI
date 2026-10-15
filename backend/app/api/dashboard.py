@@ -83,3 +83,16 @@ async def get_dashboard_ai_summary(
         patient,
 
     )
+
+
+@router.get(
+    "/guidance",
+)
+async def get_dashboard_guidance(
+    patient: PatientProfile = Depends(get_current_patient),
+    db: Session = Depends(get_db),
+):
+    return await ai_service.generate_actionable_guidance(
+        db,
+        patient,
+    )
